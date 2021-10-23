@@ -11,33 +11,53 @@ use Illuminate\Contracts\Support\Jsonable;
 class GetTreatmentRequest implements Arrayable, Jsonable
 {
     private string $featureName;
-    private string $applicationStage;
-    private string $application;
-    private string|null $entityId;
-    private string|null $defaultTreatment;
+    private ?string $applicationStage;
+    private ?string $application;
+
+
+    private ?string $entityId;
+    private ?string $defaultTreatment;
 
     /**
      * @throws Exception
      */
-    public function __construct(string      $featureName,
-                                string      $application,
-                                string      $applicationStage,
-                                string|null $entityId,
-                                string|null $defaultTreatment = null)
+    public function __construct(string  $featureName,
+                                ?string $application,
+                                ?string $applicationStage,
+                                ?string $entityId,
+                                ?string $defaultTreatment = null)
     {
         $this->featureName = $featureName;
         $this->application = $application;
         $this->applicationStage = $applicationStage;
         $this->entityId = $entityId;
         $this->defaultTreatment = $defaultTreatment;
+    }
 
-        $this->validateInputs();
+    /**
+     * @param string $applicationStage
+     * @return GetTreatmentRequest
+     */
+    public function setApplicationStage(string $applicationStage): GetTreatmentRequest
+    {
+        $this->applicationStage = $applicationStage;
+        return $this;
+    }
+
+    /**
+     * @param string $application
+     * @return GetTreatmentRequest
+     */
+    public function setApplication(string $application): GetTreatmentRequest
+    {
+        $this->application = $application;
+        return $this;
     }
 
     /**
      * @throws Exception
      */
-    protected function validateInputs()
+    public function validateInputs()
     {
         if (!in_array($this->applicationStage, array_keys(ApplicationStage::toList()))) {
             throw new Exception("{$this->applicationStage} is not a supported stage.");

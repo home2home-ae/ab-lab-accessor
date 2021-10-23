@@ -17,14 +17,30 @@ class ABLabAccessor implements ABLabAccessorInterface
         FeatureRetrieverImplementation::REDIS => null,
         FeatureRetrieverImplementation::API => null
     ];
+    protected string $appId;
+    protected string $appStage;
 
     public function __construct(array $config)
     {
         $this->config = $config;
+        $this->appId = $config['id'];
+        $this->appStage = $config['stage'];
     }
 
+    /**
+     * Core interface between A/B Lab and the world
+     *
+     * @param GetTreatmentRequest $treatmentRequest
+     * @return TreatmentResponse
+     * @throws Exception
+     */
     public function getTreatmentResponse(GetTreatmentRequest $treatmentRequest): TreatmentResponse
     {
+        // Better to resolve these automatically (appId, appStage), remove the extra parameters needed from user
+        $treatmentRequest
+            ->setApplication($this->appId)
+            ->setApplicationStage($this->appStage);
+
         /** @var FeatureRetrieverInterface $manager */
         $manager = $this->implementations[$this->config['implementation']];
         if (null === $manager) {
@@ -35,6 +51,13 @@ class ABLabAccessor implements ABLabAccessorInterface
         return $manager->getTreatment($treatmentRequest);
     }
 
+    /**
+     * Get treatment as string, better for comparing, views
+     *
+     * @param GetTreatmentRequest $treatmentRequest
+     * @return string
+     * @throws Exception
+     */
     public function getTreatment(GetTreatmentRequest $treatmentRequest): string
     {
         $response = $this->getTreatmentResponse($treatmentRequest);

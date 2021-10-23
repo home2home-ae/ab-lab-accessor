@@ -45,6 +45,9 @@ class RedisFeatureRetriever implements FeatureRetrieverInterface
      */
     public function getTreatment(GetTreatmentRequest $treatmentRequest): TreatmentResponse
     {
+        // Validate inputs before continue.
+        $treatmentRequest->validateInputs();
+
         try {
             return $this->executeGetTreatmentRequest($treatmentRequest);
         } catch (TreatmentNotFoundException $e) {
