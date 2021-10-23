@@ -1,0 +1,16 @@
+<?php
+
+namespace ABLab\Accessor\Data;
+
+interface TreatmentType
+{
+    const DEFAULT = 'DEFAULT';
+    const OVERRIDES = 'OVERRIDES';
+    const TREATMENT = 'TREATMENT';
+    const LAUNCH_TREATMENT = 'LAUNCH_TREATMENT';
+    const NOT_FOUND = 'NOT_FOUND';
+    const INVALID_DATA = 'INVALID_DATA';
+    const MISSING_STAGE = 'MISSING_STAGE';
+    const MISSING_APPLICATION = 'MISSING_APPLICATION';
+    const FEATURE_TYPE_UNAVAILABLE = 'FEATURE_TYPE_UNAVAILABLE';
+}

@@ -1,0 +1,24 @@
+{
+  "name": "rummykhan/ab-lab-accessor",
+  "description": "This package is accessor for ab-tests",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Rehan Manzoor",
+      "email": "rehan_manzoor@outlook.com"
+    }
+  ],
+  "require": {
+    "predis/predis": "^1.1",
+    "laravel/framework": "^8.54"
+  },
+  "autoload": {
+    "psr-4": {
+      "ABLab\\Accessor\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  }
+}
