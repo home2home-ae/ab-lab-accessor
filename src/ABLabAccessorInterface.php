@@ -7,5 +7,7 @@ use ABLab\Accessor\Response\TreatmentResponse;
 
 interface ABLabAccessorInterface
 {
-    public function getTreatment(GetTreatmentRequest $treatmentRequest): TreatmentResponse;
+    public function getTreatment(GetTreatmentRequest $treatmentRequest): string;
+
+    public function getTreatmentResponse(GetTreatmentRequest $treatmentRequest): TreatmentResponse;
 }

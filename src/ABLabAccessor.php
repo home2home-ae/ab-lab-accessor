@@ -23,7 +23,7 @@ class ABLabAccessor implements ABLabAccessorInterface
         $this->config = $config;
     }
 
-    public function getTreatment(GetTreatmentRequest $treatmentRequest): TreatmentResponse
+    public function getTreatmentResponse(GetTreatmentRequest $treatmentRequest): TreatmentResponse
     {
         /** @var FeatureRetrieverInterface $manager */
         $manager = $this->implementations[$this->config['implementation']];
@@ -33,6 +33,13 @@ class ABLabAccessor implements ABLabAccessorInterface
         }
 
         return $manager->getTreatment($treatmentRequest);
+    }
+
+    public function getTreatment(GetTreatmentRequest $treatmentRequest): string
+    {
+        $response = $this->getTreatmentResponse($treatmentRequest);
+
+        return $response->getTreatment();
     }
 
     private function getFeatureRetriever(string $implementation)
