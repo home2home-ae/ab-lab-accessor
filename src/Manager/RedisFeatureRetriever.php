@@ -73,8 +73,9 @@ class RedisFeatureRetriever implements FeatureRetrieverInterface
     {
         $this->treatmentRequest = $treatmentRequest;
 
-        $this->rawFeature = Redis::connection($this->getConnectionName())
-            ->get($this->getFeatureName());
+        $connection = $this->getConnection($this->getConnectionName());
+
+        $this->rawFeature = $connection->get($this->getFeatureName());
 
         if ($this->rawFeature === null) {
             throw new TreatmentNotFoundException();
