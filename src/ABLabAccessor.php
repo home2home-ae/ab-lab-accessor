@@ -19,12 +19,14 @@ class ABLabAccessor implements ABLabAccessorInterface
     ];
     protected string $appId;
     protected string $appStage;
+    protected string $defaultTreatment;
 
     public function __construct(array $config)
     {
         $this->config = $config;
         $this->appId = $config['id'];
         $this->appStage = $config['stage'];
+        $this->defaultTreatment = $config['defaultTreatment'];
     }
 
     /**
@@ -40,6 +42,10 @@ class ABLabAccessor implements ABLabAccessorInterface
         $treatmentRequest
             ->setApplication($this->appId)
             ->setApplicationStage($this->appStage);
+
+        if (null === $treatmentRequest->getDefaultTreatment()) {
+            $treatmentRequest->setDefaultTreatment($this->defaultTreatment);
+        }
 
         /** @var FeatureRetrieverInterface $manager */
         $manager = $this->implementations[$this->config['implementation']];

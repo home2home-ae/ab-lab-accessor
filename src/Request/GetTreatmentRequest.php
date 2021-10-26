@@ -55,6 +55,16 @@ class GetTreatmentRequest implements Arrayable, Jsonable
     }
 
     /**
+     * @param string $defaultTreatment
+     * @return GetTreatmentRequest
+     */
+    public function setDefaultTreatment(string $defaultTreatment): GetTreatmentRequest
+    {
+        $this->defaultTreatment = $defaultTreatment;
+        return $this;
+    }
+
+    /**
      * @throws Exception
      */
     public function validateInputs()

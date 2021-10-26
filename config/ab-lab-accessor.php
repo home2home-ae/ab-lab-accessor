@@ -6,14 +6,24 @@ return [
      * Unique application ID for the application
      * This you can take from A/B Lab Web application
      */
-    'id' => 'H2H-ADMIN',
+    'id' => env('AB_LAB_ID', 'H2H-ADMIN'),
 
     /**
      * Available options are: DEVELOPMENT, PRODUCTION
      * DEVELOPMENT: it's usually your staging / devo environment
      * PRODUCTION: it's usually your production environment
      */
-    'stage' => 'DEVELOPMENT',
+    'stage' => env('AB_LAB_ENV', 'DEVELOPMENT'),
+
+    /**
+     * Available options are: C, T1, T2, T3
+     *
+     * C: Means in worst case you want to fall back to old flow
+     * T1: Means in worst case you want to fall back to one of the new flow
+     * T2: Means in worst case you want to fall back to one of the new flow
+     * T3: Means in worst case you want to fall back to one of the new flow
+     */
+    'defaultTreatment' => env('AB_LAB_DEFAULT_TREATMENT', 'C'),
 
     /**
      * There are two possible values for the implementation: api, redis
@@ -21,7 +31,7 @@ return [
      * redis: mean redis implementation, best when ab-lab is deployed in the same VPC
      * api: it's better for microservices architecture
      */
-    'implementation' => 'redis',
+    'implementation' => env('AB_LAB_IMPLEMENTATION', 'redis'),
 
 
     /**
@@ -30,8 +40,8 @@ return [
      * API implementation is still not there, but this is the plan, we only need base url and token for authentication
      */
     'api' => [
-        'base_url' => 'http://ab-test.loc/api',
-        'token' => null,
+        'base_url' => env('AB_LAB_API_URL', 'http://ab-lab.loc/api'),
+        'token' => env('AB_LAB_API_TOKEN', null),
     ],
 
     /**
@@ -40,10 +50,10 @@ return [
      * REDIS implementation is complete and test is in progress, so far it looks good!
      */
     'redis' => [
-        'host' => '127.0.0.1',
-        'password' => null,
-        'port' => '6379',
-        'database' => 'ab_test_redis',
-        'prefix' => 'ab_test_fx_'
+        'host' => env('AB_LAB_REDIS_HOST', '127.0.0.1'),
+        'password' => env('AB_LAB_REDIS_PASSWORD', null),
+        'port' => env('AB_LAB_REDIS_PORT', '6379'),
+        'database' => env('AB_LAB_REDIS_DB', 'ab_test_redis'),
+        'prefix' => env('AB_LAB_REDIS_PREFIX', 'ab_test_fx_')
     ]
 ];
