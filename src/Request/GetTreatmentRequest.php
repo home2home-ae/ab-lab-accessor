@@ -87,17 +87,17 @@ class GetTreatmentRequest implements Arrayable, Jsonable
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getApplicationStage(): string
+    public function getApplicationStage(): ?string
     {
         return $this->applicationStage;
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getApplication(): string
+    public function getApplication(): ?string
     {
         return $this->application;
     }

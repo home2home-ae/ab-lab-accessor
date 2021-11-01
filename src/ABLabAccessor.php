@@ -38,10 +38,14 @@ class ABLabAccessor implements ABLabAccessorInterface
      */
     public function getTreatmentResponse(GetTreatmentRequest $treatmentRequest): TreatmentResponse
     {
-        // Better to resolve these automatically (appId, appStage), remove the extra parameters needed from user
-        $treatmentRequest
-            ->setApplication($this->appId)
-            ->setApplicationStage($this->appStage);
+        // resolve these automatically (appId, appStage), remove the extra parameters needed from user
+        if (null === $treatmentRequest->getApplication()) {
+            $treatmentRequest->setApplication($this->appId);
+        }
+
+        if (null === $treatmentRequest->getApplicationStage()) {
+            $treatmentRequest->setApplicationStage($this->appStage);
+        }
 
         if (null === $treatmentRequest->getDefaultTreatment()) {
             $treatmentRequest->setDefaultTreatment($this->defaultTreatment);
@@ -71,7 +75,26 @@ class ABLabAccessor implements ABLabAccessorInterface
         return $response->getTreatment();
     }
 
-    private function getFeatureRetriever(string $implementation)
+    /**
+     * Wrapper to solve the local vs remote problem
+     *
+     * @param string $implementation
+     * @return FeatureRetrieverInterface
+     * @throws Exception
+     */
+    public function withImplementation(string $implementation): FeatureRetrieverInterface
+    {
+        return $this->getFeatureRetriever($implementation);
+    }
+
+    /**
+     * Get FeatureRetriever based on the implementation
+     *
+     * @param string $implementation
+     * @return FeatureRetrieverInterface
+     * @throws Exception
+     */
+    private function getFeatureRetriever(string $implementation): FeatureRetrieverInterface
     {
         if (FeatureRetrieverImplementation::API === $implementation) {
             return $this->createApiManager();
@@ -84,7 +107,7 @@ class ABLabAccessor implements ABLabAccessorInterface
 
     protected function createApiManager()
     {
-        return new ApiFeatureRetriever();
+        return new ApiFeatureRetriever($this->config['api']);
     }
 
     protected function createRedisManager()

@@ -42,6 +42,8 @@ return [
     'api' => [
         'base_url' => env('AB_LAB_API_URL', 'http://ab-lab.loc/api'),
         'token' => env('AB_LAB_API_TOKEN', null),
+        'username' => env('AB_LAB_API_USERNAME', 'admin'),
+        'password' => env('AB_LAB_API_PASSWORD', 'admin'),
     ],
 
     /**
