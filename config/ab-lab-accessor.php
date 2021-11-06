@@ -34,8 +34,9 @@ return [
     'implementation' => env('AB_LAB_IMPLEMENTATION', 'redis'),
 
     /**
-     * Local cache implementation: request, redis, file
+     * Local cache implementation: none, request, redis, file
      *
+     * none: no caching, real time results (Good for debugging)
      * request: mean for one request every feature treatment would be cached (In memory hash-map)
      * redis: for 10 minutes all the request and treatment would be cached in redis
      * file: for 10 minutes all the request and treatment would be cached on file
@@ -50,7 +51,7 @@ return [
      */
     'cache-config' => [
         'redis-connection' => env('AB_LAB_CACHE_REDIS_CONNECTION', 'default'),
-        'path' => env('AB_LAB_CACHE_FILE_PATH', storage_path('/ab-lab-cache/')),
+        'disk' => env('AB_LAB_CACHE_DISK', 'local'),
     ],
 
     /**

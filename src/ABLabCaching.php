@@ -4,7 +4,10 @@ namespace ABLab\Accessor;
 
 use ABLab\Accessor\Cache\CacheEngineType;
 use ABLab\Accessor\Cache\CacheInterface;
+use ABLab\Accessor\Cache\FileRequestCache;
 use ABLab\Accessor\Cache\InMemorySingleRequestCache;
+use ABLab\Accessor\Cache\NoneRequestCache;
+use ABLab\Accessor\Cache\RedisRequestCache;
 use ABLab\Accessor\Request\GetTreatmentRequest;
 
 class ABLabCaching implements CacheInterface
@@ -34,7 +37,10 @@ class ABLabCaching implements CacheInterface
         }
 
         $implementation = match ($type) {
-            CacheEngineType::REQUEST => InMemorySingleRequestCache::getInstance(),
+            CacheEngineType::REQUEST => new InMemorySingleRequestCache(),
+            CacheEngineType::REDIS => new RedisRequestCache($this->config['redis-connection']),
+            CacheEngineType::NONE => new NoneRequestCache(),
+            CacheEngineType::FILE => new FileRequestCache($this->config['disk']),
             default => throw new \Exception('Not supported yet.'),
         };
 

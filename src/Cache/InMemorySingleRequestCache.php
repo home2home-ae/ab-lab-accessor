@@ -2,58 +2,47 @@
 
 namespace ABLab\Accessor\Cache;
 
+use ABLab\Accessor\Cache\Traits\RawStorageDebugger;
 use ABLab\Accessor\Request\GetTreatmentRequest;
+use ABLab\Accessor\Cache\Traits\CreateCacheKey;
 
 class InMemorySingleRequestCache implements CacheInterface
 {
-    private static CacheInterface|null $instance = null;
+    use CreateCacheKey,
+        RawStorageDebugger;
 
     private array $storage = [];
-    private array $rawStorage = [];
-
-    public static function getInstance(): CacheInterface
-    {
-        if (null == InMemorySingleRequestCache::$instance) {
-            InMemorySingleRequestCache::$instance = new InMemorySingleRequestCache();
-        }
-
-        return InMemorySingleRequestCache::$instance;
-    }
 
     /**
-     * @param GetTreatmentRequest $treatmentRequest
-     * @return array
+     * Check if it has the cache key
+     *
+     * @param string $cacheKey
+     * @return bool
      */
-    private function getTreatmentRequestCacheables(GetTreatmentRequest $treatmentRequest): array
-    {
-        return array_filter($treatmentRequest->toArray());
-    }
-
-    public function createCacheKey(GetTreatmentRequest $treatmentRequest): string
-    {
-        return md5(json_encode($this->getTreatmentRequestCacheables($treatmentRequest)));
-    }
-
     public function hasCacheKey(string $cacheKey): bool
     {
         return isset($this->storage[$cacheKey]);
     }
 
+    /**
+     * Cache treatment response
+     *
+     * @param string $cacheKey
+     * @param string $response
+     */
     public function cacheTreatmentResponse(string $cacheKey, string $response): void
     {
         $this->storage[$cacheKey] = $response;
     }
 
+    /**
+     * Get cached response
+     *
+     * @param string $cacheKey
+     * @return string
+     */
     public function getCachedResponse(string $cacheKey): string
     {
         return $this->storage[$cacheKey];
-    }
-
-    public function cacheToRawStorage(GetTreatmentRequest $treatmentRequest, string $cacheKey, string $response): void
-    {
-        $this->rawStorage[$cacheKey] = [
-            'request' => $this->getTreatmentRequestCacheables($treatmentRequest),
-            'response' => $response
-        ];
     }
 }
