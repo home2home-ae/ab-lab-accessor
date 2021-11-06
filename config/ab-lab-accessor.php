@@ -33,6 +33,25 @@ return [
      */
     'implementation' => env('AB_LAB_IMPLEMENTATION', 'redis'),
 
+    /**
+     * Local cache implementation: request, redis, file
+     *
+     * request: mean for one request every feature treatment would be cached (In memory hash-map)
+     * redis: for 10 minutes all the request and treatment would be cached in redis
+     * file: for 10 minutes all the request and treatment would be cached on file
+     */
+    'cache' => env('AB_LAB_CACHE', 'request'),
+
+    /**
+     * Local cache implementation config in case cache is redis or file
+     *
+     * redis-connection: local redis connection to use for caching
+     * path: local file path to be usef for file caching
+     */
+    'cache-config' => [
+        'redis-connection' => env('AB_LAB_CACHE_REDIS_CONNECTION', 'default'),
+        'path' => env('AB_LAB_CACHE_FILE_PATH', storage_path('/ab-lab-cache/')),
+    ],
 
     /**
      * Setting for WEB API implementation

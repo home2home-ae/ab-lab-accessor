@@ -16,8 +16,12 @@ class ABLabAccessorServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton('ab-lab-cache', function () {
+            return new ABLabCaching(config('ab-lab-accessor.cache'), config('ab-lab-accessor.cache-config'));
+        });
+
         $this->app->singleton('ab-lab-accessor', function () {
-            return new ABLabAccessor(config('ab-lab-accessor'));
+            return new ABLabAccessor($this->app->make('ab-lab-cache'), config('ab-lab-accessor'));
         });
     }
 
@@ -25,6 +29,7 @@ class ABLabAccessorServiceProvider extends ServiceProvider
     {
         return [
             'ab-lab-accessor',
+            'ab-lab-cache',
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace ABLab\Accessor;
 
+use ABLab\Accessor\Cache\CacheInterface;
 use ABLab\Accessor\Data\FeatureRetrieverImplementation;
 use ABLab\Accessor\Manager\ApiFeatureRetriever;
 use ABLab\Accessor\Manager\FeatureRetrieverInterface;
@@ -12,6 +13,7 @@ use Exception;
 
 class ABLabAccessor implements ABLabAccessorInterface
 {
+    protected CacheInterface $cacheInterface;
     protected array $config = [];
     protected array $implementations = [
         FeatureRetrieverImplementation::REDIS => null,
@@ -21,8 +23,9 @@ class ABLabAccessor implements ABLabAccessorInterface
     protected string $appStage;
     protected string $defaultTreatment;
 
-    public function __construct(array $config)
+    public function __construct(CacheInterface $cacheInterface, array $config)
     {
+        $this->cacheInterface = $cacheInterface;
         $this->config = $config;
         $this->appId = $config['id'];
         $this->appStage = $config['stage'];
@@ -38,6 +41,24 @@ class ABLabAccessor implements ABLabAccessorInterface
      */
     public function getTreatmentResponse(GetTreatmentRequest $treatmentRequest): TreatmentResponse
     {
+        /** @var FeatureRetrieverInterface $manager */
+        $manager = $this->implementations[$this->config['implementation']];
+        if (null === $manager) {
+            $manager = $this->getFeatureRetriever($this->config['implementation']);
+            $this->implementations[$this->config['implementation']] = $manager;
+        }
+
+        return $manager->getTreatment($treatmentRequest);
+    }
+
+    /**
+     * Merge variables from config to treatment request
+     *
+     * @param GetTreatmentRequest $treatmentRequest
+     * @return GetTreatmentRequest
+     */
+    private function mergeEnvironmentConfig(GetTreatmentRequest $treatmentRequest): GetTreatmentRequest
+    {
         // resolve these automatically (appId, appStage), remove the extra parameters needed from user
         if (null === $treatmentRequest->getApplication()) {
             $treatmentRequest->setApplication($this->appId);
@@ -51,14 +72,7 @@ class ABLabAccessor implements ABLabAccessorInterface
             $treatmentRequest->setDefaultTreatment($this->defaultTreatment);
         }
 
-        /** @var FeatureRetrieverInterface $manager */
-        $manager = $this->implementations[$this->config['implementation']];
-        if (null === $manager) {
-            $manager = $this->getFeatureRetriever($this->config['implementation']);
-            $this->implementations[$this->config['implementation']] = $manager;
-        }
-
-        return $manager->getTreatment($treatmentRequest);
+        return $treatmentRequest;
     }
 
     /**
@@ -70,9 +84,24 @@ class ABLabAccessor implements ABLabAccessorInterface
      */
     public function getTreatment(GetTreatmentRequest $treatmentRequest): string
     {
-        $response = $this->getTreatmentResponse($treatmentRequest);
+        $treatmentRequest = $this->mergeEnvironmentConfig($treatmentRequest);
 
-        return $response->getTreatment();
+        // create cache key
+        $cacheKey = $this->cacheInterface->createCacheKey($treatmentRequest);
+
+        // check cache key exists
+        if ($this->cacheInterface->hasCacheKey($cacheKey)) {
+            // if exists send response
+            return $this->cacheInterface->getCachedResponse($cacheKey);
+        }
+
+        $response = $this->getTreatmentResponse($treatmentRequest)->getTreatment();
+
+        // save response with cache key
+        $this->cacheInterface->cacheTreatmentResponse($cacheKey, $response);
+        $this->cacheInterface->cacheToRawStorage($treatmentRequest, $cacheKey, $response);
+
+        return $response;
     }
 
     /**
@@ -123,5 +152,15 @@ class ABLabAccessor implements ABLabAccessorInterface
     private static function setRedisConnection($connectionName, $connectionProperties)
     {
         config(["database.redis.{$connectionName}" => $connectionProperties]);
+    }
+
+    public function dd()
+    {
+        $data = [
+            'instance' => $this,
+            'cache' => app('ab-lab-cache')
+        ];
+
+        dd($data);
     }
 }

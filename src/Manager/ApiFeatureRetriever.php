@@ -12,6 +12,7 @@ class ApiFeatureRetriever implements FeatureRetrieverInterface
     const API_ENDPOINT_GET_TREATMENT = 'get-treatment';
 
     private array $config;
+    private int $apiCalls = 0;
 
     public function __construct($config)
     {
@@ -52,6 +53,7 @@ class ApiFeatureRetriever implements FeatureRetrieverInterface
 
         $url = $this->getTreatmentEndpointUrl($this->config['base_url']);
 
+        $this->apiCalls += 1;
         return $client->get($url, $treatmentRequest->toArray())->body();
     }
 }
